@@ -1,5 +1,4 @@
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-const sharp = require('axios');
 const sharp = require('sharp');
 
 async function blurCommand(sock, chatId, message, quotedMessage) {
