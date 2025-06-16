@@ -1,5 +1,5 @@
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-const axios = require('axios');
+const sharp = require('axios');
 const sharp = require('sharp');
 
 async function blurCommand(sock, chatId, message, quotedMessage) {
@@ -11,7 +11,7 @@ async function blurCommand(sock, chatId, message, quotedMessage) {
             // If replying to a message
             if (!quotedMessage.imageMessage) {
                 await sock.sendMessage(chatId, { 
-                    text: '❌ Please reply to an image message' 
+                    text: '❌ *Arslan-MD Says:* Reply to an image only!' 
                 });
                 return;
             }
@@ -22,62 +22,54 @@ async function blurCommand(sock, chatId, message, quotedMessage) {
                 }
             };
             
-            imageBuffer = await downloadMediaMessage(
-                quoted,
-                'buffer',
-                { },
-                { }
-            );
+            imageBuffer = await downloadMediaMessage(quoted, 'buffer', {}, {});
         } else if (message.message?.imageMessage) {
             // If image is in current message
-            imageBuffer = await downloadMediaMessage(
-                message,
-                'buffer',
-                { },
-                { }
-            );
+            imageBuffer = await downloadMediaMessage(message, 'buffer', {}, {});
         } else {
             await sock.sendMessage(chatId, { 
-                text: '❌ Please reply to an image or send an image with caption .blur' 
+                text: '❌ *Arslan-MD Says:* Use `.blur` on an image or reply to one!' 
             });
             return;
         }
 
-        // Resize and optimize image
-        const resizedImage = await sharp(imageBuffer)
-            .resize(800, 800, { // Resize to max 800x800
+        // Ultra Pro Max Blur Effect
+        const blurredImage = await sharp(imageBuffer)
+            .resize(800, 800, { 
                 fit: 'inside',
-                withoutEnlargement: true
+                withoutEnlargement: true 
             })
-            .jpeg({ quality: 80 }) // Convert to JPEG with 80% quality
+            .blur(15) // Stronger blur effect
+            .jpeg({ 
+                quality: 90, 
+                mozjpeg: true  // Better compression
+            })
             .toBuffer();
 
-        // Apply blur effect directly using sharp
-        const blurredImage = await sharp(resizedImage)
-            .blur(10) // Blur radius of 10
-            .toBuffer();
-
-        // Send the blurred image
+        // Send with Arslan-MD Style
         await sock.sendMessage(chatId, {
             image: blurredImage,
-            caption: '*[ ✔ ] Image Blurred Successfully*',
+            caption: '✨ *Blurred by Arslan-MD Pro Max!* ✨',
             contextInfo: {
-                forwardingScore: 1,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363161513685998@newsletter',
-                    newsletterName: 'KnightBot MD',
-                    serverMessageId: -1
+                externalAdReply: {
+                    title: 'ARSLAN-MD ULTRA',
+                    body: 'Premium Blur Effect',
+                    thumbnail: await sharp(imageBuffer)
+                        .resize(100, 100)
+                        .toBuffer(),
+                    mediaType: 1,
+                    mediaUrl: '',
+                    sourceUrl: 'https://github.com/Arslan-Md'
                 }
             }
         });
 
     } catch (error) {
-        console.error('Error in blur command:', error);
+        console.error('Arslan-MD Blur Error:', error);
         await sock.sendMessage(chatId, { 
-            text: '❌ Failed to blur image. Please try again later.' 
+            text: '⚠️ *Arslan-MD Failed:* Blur nahi ho paya! Owner ko batao.' 
         });
     }
 }
 
-module.exports = blurCommand; 
+module.exports = blurCommand;
